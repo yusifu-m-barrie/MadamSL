@@ -3,10 +3,10 @@ import type { CurrentUser } from "sanity";
 /**
  * Soft access control for the communications officer.
  *
- * - Listed news-officer emails → News + News Letters desk ONLY
+ * - Listed officer emails → News, News Letters, and Projects only
  *   (even if they were invited as Administrator by mistake)
  * - Other Administrators → full Studio
- * - Other non-admins (Editor / Contributor) → News + News Letters only
+ * - Other non-admins (Editor / Contributor) → same limited desk
  *
  * Invite the officer as Editor so they can publish/delete without approval.
  * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
@@ -16,7 +16,7 @@ const HARDCODED_NEWS_EDITOR_EMAILS: string[] = [
 ];
 
 /** Document types the communications officer may manage. */
-export const NEWS_DESK_TYPES = ["post", "newsletterIssue"] as const;
+export const NEWS_DESK_TYPES = ["post", "newsletterIssue", "project"] as const;
 
 export type NewsDeskType = (typeof NEWS_DESK_TYPES)[number];
 

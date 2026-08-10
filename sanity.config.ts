@@ -31,7 +31,7 @@ export default defineConfig({
   ],
   schema: {
     types: schemaTypes,
-    // Hide non-news templates from the global "Create" menu for news officers
+    // Hide non-comms templates from the global "Create" menu for officers
     templates: (prev, { currentUser }) => {
       if (!isNewsOnlyEditor(currentUser)) return prev;
       return prev.filter((template) => isNewsDeskType(template.schemaType));
@@ -54,7 +54,7 @@ export default defineConfig({
         return isNewsDeskType(type);
       });
     },
-    // Strip edit/publish/delete on anything outside News / News Letters
+    // Strip edit/publish/delete on anything outside News / News Letters / Projects
     actions: (prev, { schemaType, currentUser }) => {
       if (!isNewsOnlyEditor(currentUser)) return prev;
       if (isNewsDeskType(schemaType)) return prev;

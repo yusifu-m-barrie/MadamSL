@@ -1,17 +1,58 @@
 import type { StructureResolver } from "sanity/structure";
 import { isNewsOnlyEditor } from "./access";
 
+function projectsFolder(S: Parameters<StructureResolver>[0]) {
+  return S.listItem()
+    .title("Projects")
+    .id("projects-folder")
+    .child(
+      S.list()
+        .title("Projects")
+        .items([
+          S.listItem()
+            .title("Ongoing Projects")
+            .id("projects-ongoing")
+            .child(
+              S.documentTypeList("project")
+                .title("Ongoing Projects")
+                .filter('_type == "project" && status == "ongoing"')
+                .defaultOrdering([{ field: "sortOrder", direction: "asc" }]),
+            ),
+          S.listItem()
+            .title("Past Projects")
+            .id("projects-past")
+            .child(
+              S.documentTypeList("project")
+                .title("Past Projects")
+                .filter('_type == "project" && status == "past"')
+                .defaultOrdering([{ field: "sortOrder", direction: "asc" }]),
+            ),
+          S.divider(),
+          S.listItem()
+            .title("All Projects")
+            .id("projects-all")
+            .child(
+              S.documentTypeList("project")
+                .title("All Projects")
+                .defaultOrdering([{ field: "title", direction: "asc" }]),
+            ),
+        ]),
+    );
+}
+
 /**
  * Studio sidebar mirrors the public site.
- * News-only editors (comms officer) only see Latest News.
+ * Communications officers only see News, News Letters, and Projects.
  */
 export const deskStructure: StructureResolver = (S, context) => {
   if (isNewsOnlyEditor(context.currentUser)) {
     return S.list()
-      .title("News desk")
+      .title("Communications")
       .items([
         S.documentTypeListItem("post").title("Latest News"),
         S.documentTypeListItem("newsletterIssue").title("News Letters"),
+        S.divider(),
+        projectsFolder(S),
       ]);
   }
 
@@ -100,43 +141,7 @@ export const deskStructure: StructureResolver = (S, context) => {
             .defaultOrdering([{ field: "title", direction: "asc" }]),
         ),
 
-      S.listItem()
-        .title("Projects")
-        .id("projects-folder")
-        .child(
-          S.list()
-            .title("Projects")
-            .items([
-              S.listItem()
-                .title("Ongoing Projects")
-                .id("projects-ongoing")
-                .child(
-                  S.documentTypeList("project")
-                    .title("Ongoing Projects")
-                    .filter('_type == "project" && status == "ongoing"')
-                    .defaultOrdering([{ field: "sortOrder", direction: "asc" }]),
-                ),
-              S.listItem()
-                .title("Past Projects")
-                .id("projects-past")
-                .child(
-                  S.documentTypeList("project")
-                    .title("Past Projects")
-                    .filter('_type == "project" && status == "past"')
-                    .defaultOrdering([{ field: "sortOrder", direction: "asc" }]),
-                ),
-              S.divider(),
-              S.listItem()
-                .title("All Projects")
-                .id("projects-all")
-                .child(
-                  S.documentTypeList("project")
-                    .title("All Projects")
-                    .defaultOrdering([{ field: "title", direction: "asc" }]),
-                ),
-            ]),
-        ),
-
+      projectsFolder(S),
       S.listItem()
         .title("Staff")
         .id("staff-folder")
