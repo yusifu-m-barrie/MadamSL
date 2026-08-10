@@ -36,6 +36,8 @@ export const seedSettings: SiteSettings = {
   socialLinks: [
     { network: "facebook", url: "https://www.facebook.com/africaagrilinks/" },
     { network: "x", url: "https://x.com/madamsl1" },
+    { network: "instagram", url: "https://www.instagram.com/madamsl1/" },
+    { network: "youtube", url: "https://www.youtube.com/@madamsl" },
   ],
   copyright: "Copyright © MADAM SL | Developed By Link Corporation Limited SL",
   supportCtaLabel: "Support Us",

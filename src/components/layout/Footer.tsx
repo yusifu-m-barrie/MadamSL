@@ -10,11 +10,11 @@ export function Footer({
   navigation: NavItem[];
 }) {
   return (
-    <footer className="mt-auto bg-[var(--madam-ink)] text-white">
+    <footer className="mt-auto border-t border-[var(--madam-border)] bg-[var(--madam-surface)] text-[var(--foreground)] shadow-sm shadow-black/5 dark:shadow-white/5">
       <Container className="grid gap-10 py-14 md:grid-cols-3">
         <div>
           <p className="text-2xl font-bold tracking-wide">{settings.siteName || "MADAM"}</p>
-          <p className="mt-3 text-sm leading-relaxed text-white/70">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--madam-muted)]">
             Mankind&apos;s Activities for Development Accreditation Movement — helping people to help
             themselves through agriculture, skills development, and community partnerships in Sierra
             Leone.
@@ -24,7 +24,7 @@ export function Footer({
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[var(--madam-green)]">
             Quick Links
           </h3>
-          <ul className="space-y-2 text-sm text-white/80">
+          <ul className="space-y-2 text-sm text-[var(--madam-muted)]">
             {navigation.slice(0, 7).map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="hover:text-[var(--madam-green)]">
@@ -38,7 +38,7 @@ export function Footer({
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[var(--madam-green)]">
             Contact
           </h3>
-          <ul className="space-y-3 text-sm text-white/80">
+          <ul className="space-y-3 text-sm text-[var(--madam-muted)]">
             {settings.address ? <li>{settings.address}</li> : null}
             {settings.phone ? (
               <li>
@@ -73,7 +73,7 @@ export function Footer({
         </div>
       </Container>
       <div className="border-t border-white/10">
-        <Container className="flex flex-col gap-2 py-4 text-xs text-white/50 sm:flex-row sm:justify-between">
+        <Container className="flex flex-col gap-2 py-4 text-xs text-[var(--madam-muted)] sm:flex-row sm:justify-between">
           <p>
             <CopyrightLine
               text={

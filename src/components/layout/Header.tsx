@@ -2,14 +2,48 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ComponentPropsWithoutRef } from "react";
 import type { NavItem, SiteSettings } from "@/sanity/types";
 import type { SanityImage } from "@/sanity/types";
 import { Container } from "@/components/ui/Container";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { urlForImage } from "@/sanity/lib/image";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Mail, MapPin, Menu, X } from "lucide-react";
+
+function FacebookIcon(props: ComponentPropsWithoutRef<"svg">) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+function InstagramIcon(props: ComponentPropsWithoutRef<"svg">) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <path d="M17.5 6.5h.01" />
+    </svg>
+  );
+}
+
+function YoutubeIcon(props: ComponentPropsWithoutRef<"svg">) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2" y="7" width="20" height="10" rx="5" ry="5" />
+      <polygon points="10 9 16 12 10 15 10 9" fill="currentColor" />
+    </svg>
+  );
+}
+
+const socialIconMap = {
+  facebook: FacebookIcon,
+  x: X,
+  youtube: YoutubeIcon,
+  instagram: InstagramIcon,
+} as const;
 
 function LogoMark({
   siteName,
@@ -116,39 +150,83 @@ export function Header({
   const [open, setOpen] = useState(false);
   const [expandedNested, setExpandedNested] = useState<string | null>(null);
   const siteName = settings.siteName || "MADAM";
+  const address = settings.address;
+  const email = settings.email;
+  const socialLinks = settings.socialLinks ?? [];
 
   return (
-    <header className="dark-header sticky top-0 z-50 border-b border-[var(--madam-border)] bg-[var(--madam-header)] shadow-sm backdrop-blur-sm">
-      <Container className="flex items-center justify-between gap-4 py-2">
-        <LogoMark siteName={siteName} logo={logo || settings.logo} />
-        <DesktopNav items={navigation} />
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <button
-            type="button"
-            className="inline-flex h-10 w-10 items-center justify-center border border-[var(--madam-border)] text-[var(--madam-ink)] xl:hidden"
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? (
-              <X className="h-5 w-5" aria-hidden />
-            ) : (
-              <Menu className="h-5 w-5" aria-hidden />
-            )}
-          </button>
-        </div>
-      </Container>
+    <header className="sticky top-0 z-50">
+      <div className="bg-[var(--madam-green)] text-white">
+        <Container className="flex flex-col items-start justify-between gap-2 py-1.5 text-[13px] sm:flex-row sm:items-center sm:gap-0">
+          <div className="flex w-full flex-col gap-1 text-white/90 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
+            {address ? (
+              <div className="inline-flex items-center gap-1 sm:gap-2">
+                <MapPin className="h-4 w-4" aria-hidden />
+                <span>{address}</span>
+              </div>
+            ) : null}
+            {email ? (
+              <a
+                href={`mailto:${email}`}
+                className="inline-flex items-center gap-1 text-[13px] text-white/90 transition hover:text-white sm:gap-2"
+              >
+                <Mail className="h-4 w-4" aria-hidden />
+                <span>{email}</span>
+              </a>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {socialLinks.map((social) => {
+              if (!social.url || !social.network) return null;
+              const Icon = socialIconMap[social.network.toLowerCase() as keyof typeof socialIconMap];
+              return (
+                <a
+                  key={social.network}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
+                  aria-label={social.network}
+                >
+                  {Icon ? <Icon className="h-4 w-4" aria-hidden /> : social.network}
+                </a>
+              );
+            })}
+          </div>
+        </Container>
+      </div>
 
-      <div
-        id="mobile-menu"
-        className={cn(
-          "border-t border-[var(--madam-border)] bg-[var(--madam-header)] xl:hidden",
-          open ? "block" : "hidden",
-        )}
-      >
-        <Container className="max-h-[80vh] overflow-y-auto py-4">
+      <div className="dark-header border-b border-[var(--madam-border)] bg-[var(--madam-header)] shadow-sm backdrop-blur-sm">
+        <Container className="flex items-center justify-between gap-4 py-2">
+          <LogoMark siteName={siteName} logo={logo || settings.logo} />
+          <DesktopNav items={navigation} />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center border border-[var(--madam-border)] text-[var(--madam-ink)] xl:hidden"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              aria-label={open ? "Close menu" : "Open menu"}
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? (
+                <X className="h-5 w-5" aria-hidden />
+              ) : (
+                <Menu className="h-5 w-5" aria-hidden />
+              )}
+            </button>
+          </div>
+        </Container>
+
+        <div
+          id="mobile-menu"
+          className={cn(
+            "border-t border-[var(--madam-border)] bg-[var(--madam-header)] xl:hidden",
+            open ? "block" : "hidden",
+          )}
+        >
+          <Container className="max-h-[80vh] overflow-y-auto py-4">
           <ul className="space-y-1">
             {navigation.map((item) => (
               <li key={item.href + item.label}>
@@ -222,6 +300,7 @@ export function Header({
           </ul>
         </Container>
       </div>
+    </div>
     </header>
   );
 }

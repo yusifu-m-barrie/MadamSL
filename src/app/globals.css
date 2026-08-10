@@ -13,6 +13,7 @@
   --madam-card: #ffffff;
   --madam-border: rgba(0, 0, 0, 0.08);
   --madam-header: #ffffff;
+  --madam-footer: #ffffff;
   --font-size-base: 1.125rem;
 }
 
@@ -28,6 +29,7 @@
   --madam-card: #171c17;
   --madam-border: rgba(255, 255, 255, 0.1);
   --madam-header: #121712;
+  --madam-footer: #121712;
 }
 
 @theme inline {
