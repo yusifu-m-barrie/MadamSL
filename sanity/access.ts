@@ -17,8 +17,7 @@ import type { CurrentUser } from "sanity";
  * This is UI-level protection. API-hard locks need Sanity Enterprise.
  */
 const HARDCODED_NEWS_EDITOR_EMAILS: string[] = [
-  // Optional fallback if you prefer not to use env, e.g.:
-  // "comms@madam-sl.org",
+  "usifumbarrie3360@gmail.com",
 ];
 
 function parseEnvEmails(raw?: string): string[] {
