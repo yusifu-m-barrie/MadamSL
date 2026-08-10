@@ -6,21 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "seed:sanity": "tsx scripts/seed-sanity.ts",
+    "import:staff-photos": "tsx scripts/import-project-staff-photos.ts",
+    "import:staff-photos:ytsc": "tsx scripts/import-project-staff-photos.ts --page=ytsc",
+    "import:staff-photos:admin": "tsx scripts/import-project-staff-photos.ts --page=admin",
+    "import:news": "tsx scripts/import-news.ts",
+    "import:project-images": "tsx scripts/import-project-images.ts",
+    "fix:news-titles": "tsx scripts/fix-news-titles.ts",
+    "import:newsletter": "tsx scripts/import-newsletter.ts",
+    "upload:agriculture-image": "tsx scripts/upload-what-we-do-agriculture.ts",
+    "upload:what-we-do-images": "tsx scripts/upload-what-we-do-images.ts",
+    "seed:what-we-do": "tsx scripts/seed-what-we-do.ts",
+    "seed:site-pages": "tsx scripts/seed-site-pages.ts"
   },
   "dependencies": {
+    "@portabletext/react": "^7.0.1",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.9.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.30.0",
     "next": "16.3.0",
+    "next-sanity": "^13.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sanity": "^6.9.1",
+    "styled-components": "^6.5.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.11",
     "typescript": "^5"
   }
 }

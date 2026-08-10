@@ -31,31 +31,89 @@ Sections are building blocks (text, image + text, staff list, etc.). Ask a devel
 
 Unpublish: open the post → ellipsis / Unpublish (keeps draft off the public site).
 
-## Upload an image
+## Website Images (upload by location)
 
-1. Click an image field → Upload
-2. Add **Alt text** (describe the image for accessibility)
-3. Prefer wide, sharp photos; Sanity will resize for the website
+In Sanity Studio open **Website Images**. Each field is labeled by where it appears on [madam-sl.org](https://www.madam-sl.org/):
 
-Do not upload private documents or personal data that should not be public.
+| Studio field | Appears on |
+|--------------|------------|
+| Header / Footer logo | Site header |
+| Homepage → Hero slide 1 image | Slider 1 — “Helping People to help themselves” |
+| Homepage → Hero slide 2 image | Slider 2 — “PROMOTING CLIMATE SMART AGRICULTURE” |
+| Homepage → Hero slide 3 image | Slider 3 — “Helping People to help themselves” |
+| Homepage → Programs section — full background image | Full-width band behind Agriculture / Skills / Income |
+| Homepage → About MADAM image | About section photo |
+| Homepage → Our Impact → … (6 fields) | Circular impact photos |
+| Homepage → Donors & Partners logos | Partner row |
+| About → Testimonials section — background image | Full-width photo behind About page Testimonials |
+| Where we work → Sierra Leone locations map | District map with location pins |
+| Inner pages → default banner | Page hero backgrounds |
+
+Upload → Publish. Empty slots show a reminder on the site until an image is added.
+
+Staff photos: edit each **Staff** document.  
+News featured images: edit each **News** post.  
+Project images: edit each **Project**.
+
+## Homepage videos (below Latest News)
+
+1. Open **Homepage Videos** in Studio
+2. Click **Add item** under Videos
+3. Choose source:
+   - **YouTube link** — paste a YouTube URL
+   - **Upload video file** — upload mp4/webm from your computer
+   - **External video URL** — paste a direct `.mp4` / `.webm` link
+4. Optional: add a **Title**
+5. **Publish**
+
+Videos appear in a two-column row under Latest News (like the live MADAM site).
+
+## First-time: load website content into Studio
+
+The public site already has projects, staff, news, etc. To edit that same data in Studio:
+
+1. Create an **Editor** API token: [Sanity → API → Tokens](https://www.sanity.io/manage/project/n5hnlyba/api#tokens)
+2. Add it to `.env.local`:
+   `SANITY_API_WRITE_TOKEN=sk...`
+3. From the project folder run:
+   `npm run seed:sanity`
+4. Refresh `/studio` — Projects, Staff, News, Partners, Pages, and Navigation will be filled
+
+After seeding:
+
+- **Projects** → open any project → upload **Featured image** and **Project images (add one or more)**
+- **Staff** → open a person → upload **Staff photo**
+
+Re-running the seed updates text safely and **keeps images** you already uploaded on those documents.
 
 ## Manage projects
 
 1. Open **Projects**
-2. Set **Status** to Ongoing or Past
-3. Fill summary, body, image, locations
-4. Publish
+2. Create or edit a project
+3. Set **Status** to **Ongoing** or **Past** (controls which listing page it appears on)
+4. Add **Title**, **Slug**, **Summary**, and optional **Body**
+5. Images (works for ongoing and past):
+   - **Featured image** — shown on listing cards and as the main photo
+   - **Project images (add one or more)** — gallery on the project detail page; add as many as you need
+6. Optional: locations, partners, dates
+7. **Publish**
 
-Ongoing and Past listing pages update automatically.
+Past projects matching the live site include Agro-tech, ProFoNS, EncompasE, and Returnee migrants — create matching **Past** documents in Studio to manage their images and full text.
 
 ## Manage staff
 
-1. Open **Staff**
-2. Set **Team**: Administrative, Projects, or Youth Training
-3. For project staff, fill **Project team** (e.g. PSAVE)
-4. Upload a public photo only
-5. Use **Sort order** to control display order
-6. Uncheck **Active** to hide without deleting
+Staff are organized in Studio like the website:
+
+- **Staff → Administrative Staff**
+- **Staff → Our Projects Staff**
+- **Staff → Youth Training Center Staff**
+
+1. Open the matching folder
+2. Edit a person (name, position, **Staff photo**)
+3. For project staff, set **Project team label** (e.g. PSAVE Project Staff)
+4. Use **Sort order** to control display order
+5. Uncheck **Active** to hide without deleting
+6. **Publish**
 
 ## Site settings
 
