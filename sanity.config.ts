@@ -3,7 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
 import { deskStructure } from "./sanity/structure";
-import { isNewsOnlyEditor } from "./sanity/access";
+import { isNewsDeskType, isNewsOnlyEditor } from "./sanity/access";
 
 /**
  * Project ID is public (NEXT_PUBLIC). Hardcoded fallback avoids
@@ -29,25 +29,36 @@ export default defineConfig({
     structureTool({ structure: deskStructure }),
     visionTool(),
   ],
-  schema: { types: schemaTypes },
+  schema: {
+    types: schemaTypes,
+    // Hide non-news templates from the global "Create" menu for news officers
+    templates: (prev, { currentUser }) => {
+      if (!isNewsOnlyEditor(currentUser)) return prev;
+      return prev.filter((template) => isNewsDeskType(template.schemaType));
+    },
+  },
   tools: (prev, { currentUser }) => {
-    // Hide Vision (raw query console) from the communications officer
     if (isNewsOnlyEditor(currentUser)) {
       return prev.filter((tool) => tool.name !== "vision");
     }
     return prev;
   },
   document: {
-    // "+" new-document menu: news editors can only create News posts
     newDocumentOptions: (prev, { currentUser }) => {
-      if (isNewsOnlyEditor(currentUser)) {
-        return prev.filter(
-          (item) =>
-            item.templateId === "post" ||
-            (item as { schemaType?: string }).schemaType === "post",
-        );
-      }
-      return prev;
+      if (!isNewsOnlyEditor(currentUser)) return prev;
+      return prev.filter((item) => {
+        const type =
+          item.templateId ||
+          (item as { schemaType?: string }).schemaType ||
+          "";
+        return isNewsDeskType(type);
+      });
+    },
+    // Strip edit/publish/delete on anything outside News / News Letters
+    actions: (prev, { schemaType, currentUser }) => {
+      if (!isNewsOnlyEditor(currentUser)) return prev;
+      if (isNewsDeskType(schemaType)) return prev;
+      return [];
     },
   },
 });

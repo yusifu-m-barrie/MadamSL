@@ -9,7 +9,10 @@ export const deskStructure: StructureResolver = (S, context) => {
   if (isNewsOnlyEditor(context.currentUser)) {
     return S.list()
       .title("News desk")
-      .items([S.documentTypeListItem("post").title("Latest News")]);
+      .items([
+        S.documentTypeListItem("post").title("Latest News"),
+        S.documentTypeListItem("newsletterIssue").title("News Letters"),
+      ]);
   }
 
   return S.list()

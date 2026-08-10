@@ -3,22 +3,22 @@ import type { CurrentUser } from "sanity";
 /**
  * Soft access control for the communications officer.
  *
- * Default behaviour (recommended for deploy):
- * - Administrators → full Studio (all pages, projects, staff, etc.)
- * - Everyone else (Editor / Contributor) → News desk only
+ * - Listed news-officer emails → News + News Letters desk ONLY
+ *   (even if they were invited as Administrator by mistake)
+ * - Other Administrators → full Studio
+ * - Other non-admins (Editor / Contributor) → News + News Letters only
  *
- * Optional: set NEXT_PUBLIC_SANITY_NEWS_EDITOR_EMAILS (comma-separated)
- * to lock the News desk to specific emails only. Until that is set,
- * any non-admin member invited as Editor only sees News.
- *
- * Invite the officer as Editor (not Contributor) so they can publish,
- * edit, and delete posts without your approval.
- *
- * This is UI-level protection. API-hard locks need Sanity Enterprise.
+ * Invite the officer as Editor so they can publish/delete without approval.
+ * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
  */
 const HARDCODED_NEWS_EDITOR_EMAILS: string[] = [
   "usifumbarrie3360@gmail.com",
 ];
+
+/** Document types the communications officer may manage. */
+export const NEWS_DESK_TYPES = ["post", "newsletterIssue"] as const;
+
+export type NewsDeskType = (typeof NEWS_DESK_TYPES)[number];
 
 function parseEnvEmails(raw?: string): string[] {
   if (!raw?.trim()) return [];
@@ -44,14 +44,30 @@ export function isAdministrator(user: CurrentUser | null | undefined): boolean {
   );
 }
 
+function userEmail(user: CurrentUser | null | undefined): string | undefined {
+  const email = user?.email?.trim().toLowerCase();
+  return email || undefined;
+}
+
+export function isListedNewsOfficer(user: CurrentUser | null | undefined): boolean {
+  const email = userEmail(user);
+  if (!email) return false;
+  return newsEditorEmails().includes(email);
+}
+
+export function isNewsDeskType(schemaType: string): boolean {
+  return (NEWS_DESK_TYPES as readonly string[]).includes(schemaType);
+}
+
+/**
+ * Restricted News desk for:
+ * 1) Explicitly listed communications officers (always), or
+ * 2) Any member who is not a project Administrator
+ */
 export function isNewsOnlyEditor(user: CurrentUser | null | undefined): boolean {
   if (!user) return false;
+  // Listed officers never get the full desk — even if invited as Admin
+  if (isListedNewsOfficer(user)) return true;
   if (isAdministrator(user)) return false;
-
-  const allowlist = newsEditorEmails();
-  // No allowlist yet → every non-admin is news-only (safe default for MADAM)
-  if (!allowlist.length) return true;
-
-  if (!user.email) return true;
-  return allowlist.includes(user.email.toLowerCase());
+  return true;
 }
