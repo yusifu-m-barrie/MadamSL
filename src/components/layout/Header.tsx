@@ -45,6 +45,12 @@ const socialIconMap = {
   instagram: InstagramIcon,
 } as const;
 
+const socialBrandColors: Record<string, string> = {
+  facebook: "#1877F2",
+  instagram: "#E1306C",
+  youtube: "#FF0000",
+  x: "#1DA1F2",
+};
 function LogoMark({
   siteName,
   logo,
@@ -178,17 +184,30 @@ export function Header({
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {socialLinks.map((social) => {
               if (!social.url || !social.network) return null;
-              const Icon = socialIconMap[social.network.toLowerCase() as keyof typeof socialIconMap];
+              const rawKey = social.network.toLowerCase().trim();
+              if (rawKey === "youtube" || rawKey.includes("youtube") || rawKey.includes("yt")) return null;
+              let key = rawKey;
+              if (!Object.prototype.hasOwnProperty.call(socialIconMap, rawKey)) {
+                if (rawKey.includes("insta")) key = "instagram";
+                else if (rawKey.includes("face")) key = "facebook";
+                else if (rawKey === "twitter") key = "x";
+              }
+              const Icon = socialIconMap[key as keyof typeof socialIconMap];
+              const color = socialBrandColors[key] ?? undefined;
               return (
                 <a
                   key={social.network}
                   href={social.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white transition hover:opacity-90"
                   aria-label={social.network}
                 >
-                  {Icon ? <Icon className="h-4 w-4" aria-hidden /> : social.network}
+                  {Icon ? (
+                    <Icon className="h-4 w-4" style={{ color }} aria-hidden />
+                  ) : (
+                    social.network
+                  )}
                 </a>
               );
             })}
