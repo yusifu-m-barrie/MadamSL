@@ -12,16 +12,6 @@ function FacebookIcon(props: ComponentPropsWithoutRef<"svg">) {
   );
 }
 
-function InstagramIcon(props: ComponentPropsWithoutRef<"svg">) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <path d="M17.5 6.5h.01" />
-    </svg>
-  );
-}
-
 function YoutubeIcon(props: ComponentPropsWithoutRef<"svg">) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -35,12 +25,10 @@ const socialIconMap = {
   facebook: FacebookIcon,
   x: X,
   youtube: YoutubeIcon,
-  instagram: InstagramIcon,
 } as const;
 
 const socialBrandColors: Record<string, string> = {
   facebook: "#1877F2",
-  instagram: "#E1306C",
   youtube: "#FF0000",
   x: "#1DA1F2",
 };
@@ -103,10 +91,10 @@ export function Footer({
               if (!s.url || !s.network) return null;
               const rawKey = s.network.toLowerCase().trim();
               if (rawKey === "youtube" || rawKey.includes("youtube") || rawKey.includes("yt")) return null;
+              if (rawKey === "instagram" || rawKey.includes("insta")) return null;
               let key = rawKey;
               if (!Object.prototype.hasOwnProperty.call(socialIconMap, rawKey)) {
-                if (rawKey.includes("insta")) key = "instagram";
-                else if (rawKey.includes("face")) key = "facebook";
+                if (rawKey.includes("face")) key = "facebook";
                 else if (rawKey === "twitter") key = "x";
               }
               const Icon = socialIconMap[key as keyof typeof socialIconMap];
