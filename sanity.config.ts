@@ -3,7 +3,7 @@ import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./sanity/schemas";
 import { deskStructure } from "./sanity/structure";
-import { isNewsDeskType, isNewsOnlyEditor } from "./sanity/access";
+import { canEditDocument, canEditSchemaType, studioAccess } from "./sanity/access";
 
 /**
  * Project ID is public (NEXT_PUBLIC). Hardcoded fallback avoids
@@ -31,33 +31,37 @@ export default defineConfig({
   ],
   schema: {
     types: schemaTypes,
-    // Hide non-comms templates from the global "Create" menu for officers
     templates: (prev, { currentUser }) => {
-      if (!isNewsOnlyEditor(currentUser)) return prev;
-      return prev.filter((template) => isNewsDeskType(template.schemaType));
+      const access = studioAccess(currentUser);
+      if (access.kind === "admin") return prev;
+      if (access.kind === "denied") return [];
+      return prev.filter((template) => canEditSchemaType(currentUser, template.schemaType));
     },
   },
   tools: (prev, { currentUser }) => {
-    if (isNewsOnlyEditor(currentUser)) {
-      return prev.filter((tool) => tool.name !== "vision");
-    }
-    return prev;
+    const access = studioAccess(currentUser);
+    if (access.kind === "admin") return prev;
+    return prev.filter((tool) => tool.name !== "vision");
   },
   document: {
     newDocumentOptions: (prev, { currentUser }) => {
-      if (!isNewsOnlyEditor(currentUser)) return prev;
+      const access = studioAccess(currentUser);
+      if (access.kind === "admin") return prev;
+      if (access.kind === "denied") return [];
       return prev.filter((item) => {
         const type =
           item.templateId ||
           (item as { schemaType?: string }).schemaType ||
           "";
-        return isNewsDeskType(type);
+        return canEditSchemaType(currentUser, type);
       });
     },
-    // Strip edit/publish/delete on anything outside News / News Letters / Projects
-    actions: (prev, { schemaType, currentUser }) => {
-      if (!isNewsOnlyEditor(currentUser)) return prev;
-      if (isNewsDeskType(schemaType)) return prev;
+    actions: (prev, context) => {
+      const { schemaType, currentUser } = context;
+      const documentId =
+        (context as { documentId?: string; id?: string }).documentId ??
+        (context as { id?: string }).id;
+      if (canEditDocument(currentUser, schemaType, documentId)) return prev;
       return [];
     },
   },
