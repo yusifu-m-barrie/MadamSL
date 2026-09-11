@@ -1,79 +1,38 @@
 import type { CurrentUser } from "sanity";
 
 /**
- * Studio access is allowlist + role based.
+ * Studio UI access:
  *
- * 1. Invite the person in Sanity Manage (Editor for content roles, Admin for full CMS).
- * 2. Add their email to the matching NEXT_PUBLIC_SANITY_*_EMAILS list and redeploy.
+ * - Listed admin emails → full CMS (settings, navigation, images, videos, etc.)
+ * - Every other invited member → content sections only
+ *   Pages, News, What We Do, Projects, Staff, Partners, News Letters, Locations
+ *   Home and Contact pages stay locked.
  *
- * Unlisted Editor accounts see an "Access denied" desk (no documents).
- * Listed restricted emails never get the full desk — even if invited as Admin.
- * Unlisted Sanity Administrators keep full Studio so the project owner is not locked out.
- *
+ * On the Free plan invite people as Administrator; this still hides admin sections.
  * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
  */
 
-export const STUDIO_ROLES = {
-  admin: {
-    label: "Administrator",
-    types: "*" as const,
-  },
-  news: {
-    label: "News",
-    types: ["post", "newsletterIssue"] as const,
-  },
-  projects: {
-    label: "Projects",
-    types: ["project"] as const,
-  },
-  staff: {
-    label: "Staff",
-    types: ["staffMember"] as const,
-  },
-  pages: {
-    label: "Pages",
-    types: ["page", "whatWeDoPage"] as const,
-  },
-  communications: {
-    label: "Communications",
-    types: ["post", "newsletterIssue", "project"] as const,
-  },
-} as const;
+export const CONTENT_EDITOR_TYPES = [
+  "page",
+  "post",
+  "whatWeDoPage",
+  "project",
+  "staffMember",
+  "partner",
+  "newsletterIssue",
+  "location",
+] as const;
 
-export type StudioRole = keyof typeof STUDIO_ROLES;
-
-export type StudioAccess =
-  | { kind: "denied" }
-  | { kind: "admin"; roles: StudioRole[] }
-  | { kind: "restricted"; roles: StudioRole[]; types: string[]; deskTitle: string };
-
-const ROLE_ENV: Record<StudioRole, string> = {
-  admin: "NEXT_PUBLIC_SANITY_ADMIN_EMAILS",
-  news: "NEXT_PUBLIC_SANITY_NEWS_EMAILS",
-  projects: "NEXT_PUBLIC_SANITY_PROJECTS_EMAILS",
-  staff: "NEXT_PUBLIC_SANITY_STAFF_EMAILS",
-  pages: "NEXT_PUBLIC_SANITY_PAGES_EMAILS",
-  communications: "NEXT_PUBLIC_SANITY_COMMS_EMAILS",
-};
-
-/** Always-restricted communications officers (also set via env). */
-const HARDCODED_ROLE_EMAILS: Partial<Record<StudioRole, string[]>> = {
-  admin: ["ayonbarrie4@gmail.com"],
-  communications: ["usifumbarrie3360@gmail.com"],
-  pages: ["codewithbah@gmail.com"],
-};
+const HARDCODED_ADMIN_EMAILS = ["ayonbarrie4@gmail.com"];
 
 /** Page editors cannot open or change these CMS pages. */
 export const LOCKED_PAGE_SLUGS = ["home", "contact"] as const;
 export const LOCKED_PAGE_IDS = ["page-home", "page-contact"] as const;
 
-const DESK_TITLE: Record<Exclude<StudioRole, "admin">, string> = {
-  news: "News",
-  projects: "Projects",
-  staff: "Staff",
-  pages: "Pages",
-  communications: "Communications",
-};
+export type StudioAccess =
+  | { kind: "denied" }
+  | { kind: "admin" }
+  | { kind: "restricted"; types: string[]; deskTitle: string };
 
 function parseEnvEmails(raw?: string): string[] {
   if (!raw?.trim()) return [];
@@ -83,79 +42,42 @@ function parseEnvEmails(raw?: string): string[] {
     .filter(Boolean);
 }
 
-function emailsForRole(role: StudioRole): string[] {
-  const fromEnv = parseEnvEmails(process.env[ROLE_ENV[role]]);
-  const hardcoded = (HARDCODED_ROLE_EMAILS[role] ?? []).map((e) => e.trim().toLowerCase());
-  const extra =
-    role === "communications"
-      ? parseEnvEmails(process.env.NEXT_PUBLIC_SANITY_NEWS_EDITOR_EMAILS)
-      : [];
-  return [...new Set([...hardcoded, ...fromEnv, ...extra])];
-}
-
 function userEmail(user: CurrentUser | null | undefined): string | undefined {
   const email = user?.email?.trim().toLowerCase();
   return email || undefined;
 }
 
-export function isAdministrator(user: CurrentUser | null | undefined): boolean {
-  if (!user) return false;
-  return (
-    user.roles?.some((r) => r.name === "administrator") ||
-    (user as { role?: string }).role === "administrator"
-  );
+export function adminEmails(): string[] {
+  return [
+    ...new Set([
+      ...HARDCODED_ADMIN_EMAILS.map((e) => e.trim().toLowerCase()),
+      ...parseEnvEmails(process.env.NEXT_PUBLIC_SANITY_ADMIN_EMAILS),
+    ]),
+  ];
 }
 
-export function rolesForUser(user: CurrentUser | null | undefined): StudioRole[] {
+export function isListedAdmin(user: CurrentUser | null | undefined): boolean {
   const email = userEmail(user);
-  if (!email) return [];
-
-  return (Object.keys(STUDIO_ROLES) as StudioRole[]).filter((role) =>
-    emailsForRole(role).includes(email),
-  );
+  if (!email) return false;
+  return adminEmails().includes(email);
 }
 
-function unionTypes(roles: StudioRole[]): string[] {
-  const types = new Set<string>();
-  for (const role of roles) {
-    const spec = STUDIO_ROLES[role].types;
-    if (spec === "*") continue;
-    for (const type of spec) types.add(type);
-  }
-  return [...types];
-}
-
-function restrictedDeskTitle(roles: StudioRole[]): string {
-  const named = roles.filter((role): role is Exclude<StudioRole, "admin"> => role !== "admin");
-  if (named.length === 1) return DESK_TITLE[named[0]];
-  if (named.length === 0) return "Studio";
-  return "Studio";
+export function isAdministrator(user: CurrentUser | null | undefined): boolean {
+  return isListedAdmin(user);
 }
 
 export function studioAccess(user: CurrentUser | null | undefined): StudioAccess {
   if (!user) return { kind: "denied" };
 
-  const roles = rolesForUser(user);
-
-  if (roles.includes("admin")) {
-    return { kind: "admin", roles };
+  if (isListedAdmin(user)) {
+    return { kind: "admin" };
   }
 
-  if (roles.length > 0) {
-    return {
-      kind: "restricted",
-      roles,
-      types: unionTypes(roles),
-      deskTitle: restrictedDeskTitle(roles),
-    };
-  }
-
-  // Project owner escape hatch — not on the allowlist, but already a Sanity Admin.
-  if (isAdministrator(user)) {
-    return { kind: "admin", roles: ["admin"] };
-  }
-
-  return { kind: "denied" };
+  return {
+    kind: "restricted",
+    types: [...CONTENT_EDITOR_TYPES],
+    deskTitle: "Content",
+  };
 }
 
 export function isRestrictedEditor(user: CurrentUser | null | undefined): boolean {
@@ -185,8 +107,7 @@ export function isLockedPageDocument(documentId?: string | null): boolean {
 }
 
 export function shouldHideLockedPages(user: CurrentUser | null | undefined): boolean {
-  const access = studioAccess(user);
-  return access.kind === "restricted" && access.roles.includes("pages");
+  return studioAccess(user).kind === "restricted";
 }
 
 export function lockedPagesGroqFilter(): string {
@@ -207,8 +128,8 @@ export function canEditDocument(
   return true;
 }
 
-/** @deprecated Use studioAccess / canEditSchemaType */
-export const NEWS_DESK_TYPES = STUDIO_ROLES.communications.types;
+/** @deprecated Use CONTENT_EDITOR_TYPES */
+export const NEWS_DESK_TYPES = ["post", "newsletterIssue", "project"] as const;
 export type NewsDeskType = (typeof NEWS_DESK_TYPES)[number];
 
 export function isNewsDeskType(schemaType: string): boolean {
@@ -220,5 +141,5 @@ export function isNewsOnlyEditor(user: CurrentUser | null | undefined): boolean 
 }
 
 export function newsEditorEmails(): string[] {
-  return emailsForRole("communications");
+  return [];
 }

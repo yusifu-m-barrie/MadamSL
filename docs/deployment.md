@@ -15,13 +15,7 @@ Copy `.env.example` → `.env.local` (never commit secrets).
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | yes | Sanity project |
 | `NEXT_PUBLIC_SANITY_DATASET` | yes | Usually `production` |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | yes | e.g. `2025-01-01` |
-| `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` | yes | Full Studio dashboard (comma-separated) |
-| `NEXT_PUBLIC_SANITY_NEWS_EMAILS` | yes | News + News Letters only |
-| `NEXT_PUBLIC_SANITY_PROJECTS_EMAILS` | yes | Projects only |
-| `NEXT_PUBLIC_SANITY_STAFF_EMAILS` | yes | Staff only |
-| `NEXT_PUBLIC_SANITY_PAGES_EMAILS` | yes | Pages + What We Do (not Home or Contact) |
-| `NEXT_PUBLIC_SANITY_COMMS_EMAILS` | yes | News + News Letters + Projects |
-| `NEXT_PUBLIC_SANITY_NEWS_EDITOR_EMAILS` | yes | Legacy alias for communications emails |
+| `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` | yes | Full Studio dashboard (comma-separated). Everyone else invited to the project gets content sections only. |
 | `NEXT_PUBLIC_SITE_URL` | yes | Canonical origin |
 | `SANITY_API_READ_TOKEN` | **no** | Draft/preview reads |
 | `SANITY_REVALIDATE_SECRET` | **no** | Webhook auth |
@@ -47,13 +41,11 @@ Add CORS origin for local (`http://localhost:3000`) and production domain in San
 ## Inviting Studio users (handover)
 
 1. In [Sanity Manage → Members](https://www.sanity.io/manage/project/n5hnlyba), invite the person:
-   - **Free plan:** use **Administrator** for anyone who must publish (Editor is a Growth-plan role). The Studio allowlist still limits their sidebar.
+   - **Free plan:** use **Administrator** for anyone who must publish (Editor is a Growth-plan role). Studio still limits them to content sections.
    - Do not use **Viewer** (cannot edit) or **Blueprint**.
-2. Add the same email to the matching `NEXT_PUBLIC_SANITY_*_EMAILS` variable on Vercel (and `.env.local` for local).
-3. Redeploy so Studio picks up the list.
+2. Only add an email to `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` if they should see the full CMS (settings, navigation, images).
+3. Redeploy if you changed admin emails.
 4. They open `https://www.madam-sl.org/studio` and sign in.
-
-Unlisted Editor accounts see **Access denied**. See [content-editor-guide.md](./content-editor-guide.md) for the role table.
 
 ## Webhook (revalidation)
 

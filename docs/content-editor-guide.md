@@ -6,33 +6,24 @@ This site is managed in **Sanity Studio** (no WordPress login).
 
 1. Go to `https://www.madam-sl.org/studio` (or `http://localhost:3000/studio` locally)
 2. Sign in with the **Google / email account you were invited with**
-3. You only see the sections assigned to your email — not the full admin dashboard
+3. Invited editors see Pages, News, What We Do, Projects, Staff, Partners, News Letters, and Locations. Home and Contact stay locked. Only listed admin emails see Site Settings, Navigation, Website Images, and Homepage Videos.
 
-Studio access is **invitation + allowlist**:
+Studio access:
 
 1. A project admin invites the person in [Sanity Manage → Project members](https://www.sanity.io/manage/project/n5hnlyba)
-   - **Free plan:** invite content people as **Administrator**. The Studio allowlist still hides everything except their sections. (Sanity’s **Editor** role is only on [Growth](https://www.sanity.io/pricing).)
-   - Do **not** invite them as **Viewer** (read-only) or **Blueprint** (not a content role).
-   - Full CMS + project settings: still add their email to `NEXT_PUBLIC_SANITY_ADMIN_EMAILS`
-2. Add that same email to the matching role list (see below) and redeploy
-3. The editor opens `/studio` and signs in
-
-If an invited Editor is **not** on a role list, Studio shows **Access denied**.
+   - **Free plan:** invite content people as **Administrator**. Studio still hides admin-only sections. (Sanity’s **Editor** role is only on [Growth](https://www.sanity.io/pricing).)
+   - Do **not** invite them as **Viewer** (read-only) or **Blueprint**.
+2. To give someone the **full** CMS, add their email to `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` and redeploy.
+3. The editor opens `/studio` and signs in.
 
 ### Who can edit what
 
-| Role | Env variable | Sections they can update |
-|------|----------------|--------------------------|
-| Administrator | `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` | Full dashboard |
-| News | `NEXT_PUBLIC_SANITY_NEWS_EMAILS` | Latest News, News Letters |
-| Projects | `NEXT_PUBLIC_SANITY_PROJECTS_EMAILS` | Projects only |
-| Staff | `NEXT_PUBLIC_SANITY_STAFF_EMAILS` | Staff only |
-| Pages | `NEXT_PUBLIC_SANITY_PAGES_EMAILS` | Pages and What We Do (**not** Home or Contact) |
-| Communications | `NEXT_PUBLIC_SANITY_COMMS_EMAILS` | News, News Letters, and Projects |
+| Who | What they can update |
+|-----|----------------------|
+| Admin email (`ayonbarrie4@gmail.com` and `NEXT_PUBLIC_SANITY_ADMIN_EMAILS`) | Full dashboard |
+| Every other invited person | Pages (not Home or Contact), News, What We Do, Projects, Staff, Partners, News Letters, Locations |
 
-Use comma-separated emails. One person can be on more than one list (their sections are combined).
-
-Do not share Studio passwords. Do not invite people as Administrator unless they should see the whole CMS.
+Do not share Studio passwords.
 
 ---
 
@@ -174,4 +165,4 @@ Keep the structure close to the public MADAM menu visitors already know.
 - Do not invent statistics or staff details
 - If something looks broken, unpublish and contact the web team
 - Studio access is by invitation only — do not share passwords
-- You will only see the sections assigned to your email. If a section is missing, ask the web team to add your email to that role.
+- You will only see content sections unless you are a listed admin. If a section is missing, ask the web team.

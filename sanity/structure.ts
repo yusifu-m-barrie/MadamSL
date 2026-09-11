@@ -164,7 +164,7 @@ function itemsForTypes(
   const items = [];
 
   if (allowed.has("page")) items.push(pagesFolder(S, options.hideLockedPages));
-  if (allowed.has("post")) items.push(S.documentTypeListItem("post").title("Latest News"));
+  if (allowed.has("post")) items.push(S.documentTypeListItem("post").title("News"));
   if (allowed.has("whatWeDoPage")) {
     items.push(
       S.listItem()
@@ -179,13 +179,11 @@ function itemsForTypes(
   }
   if (allowed.has("project")) items.push(projectsFolder(S));
   if (allowed.has("staffMember")) items.push(staffFolder(S));
+  if (allowed.has("partner")) items.push(S.documentTypeListItem("partner").title("Partners"));
   if (allowed.has("newsletterIssue")) {
     items.push(S.documentTypeListItem("newsletterIssue").title("News Letters"));
   }
-  if (allowed.has("partner")) items.push(S.documentTypeListItem("partner").title("Partners"));
   if (allowed.has("location")) items.push(S.documentTypeListItem("location").title("Locations"));
-  if (allowed.has("category")) items.push(S.documentTypeListItem("category").title("Categories"));
-  if (allowed.has("author")) items.push(S.documentTypeListItem("author").title("Authors"));
 
   return items;
 }
@@ -257,8 +255,7 @@ function fullDesk(S: StructureBuilder) {
 }
 
 /**
- * Studio sidebar: full CMS for admins, role sections for listed editors,
- * and an access-denied desk for anyone else.
+ * Studio sidebar: full CMS for listed admins, content sections for everyone else.
  */
 export const deskStructure: StructureResolver = (S, context) => {
   const access = studioAccess(context.currentUser);
