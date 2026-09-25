@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { hideAdminOnlySiteSetting } from "../access";
 
 const portableBlock = defineArrayMember({
   type: "block",
@@ -37,10 +38,28 @@ export const siteSettings = defineType({
   title: "Site Settings",
   type: "document",
   fields: [
-    defineField({ name: "siteName", type: "string", initialValue: "MADAM" }),
-    defineField({ name: "tagline", type: "string" }),
-    defineField({ name: "logo", type: "image", options: { hotspot: true } }),
-    defineField({ name: "favicon", type: "image" }),
+    defineField({
+      name: "siteName",
+      type: "string",
+      initialValue: "MADAM",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("siteName", currentUser),
+    }),
+    defineField({
+      name: "tagline",
+      type: "string",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("tagline", currentUser),
+    }),
+    defineField({
+      name: "logo",
+      type: "image",
+      options: { hotspot: true },
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("logo", currentUser),
+    }),
+    defineField({
+      name: "favicon",
+      type: "image",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("favicon", currentUser),
+    }),
     defineField({ name: "address", type: "text", rows: 3 }),
     defineField({ name: "phone", type: "string" }),
     defineField({ name: "email", type: "string" }),
@@ -54,6 +73,7 @@ export const siteSettings = defineType({
     defineField({
       name: "socialLinks",
       type: "array",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("socialLinks", currentUser),
       of: [
         {
           type: "object",
@@ -70,10 +90,28 @@ export const siteSettings = defineType({
         },
       ],
     }),
-    defineField({ name: "copyright", type: "string" }),
-    defineField({ name: "supportCtaLabel", type: "string", initialValue: "Support Us" }),
-    defineField({ name: "supportCtaHref", type: "string", initialValue: "/support-us" }),
-    defineField({ name: "defaultSeo", type: "seo" }),
+    defineField({
+      name: "copyright",
+      type: "string",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("copyright", currentUser),
+    }),
+    defineField({
+      name: "supportCtaLabel",
+      type: "string",
+      initialValue: "Support Us",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("supportCtaLabel", currentUser),
+    }),
+    defineField({
+      name: "supportCtaHref",
+      type: "string",
+      initialValue: "/support-us",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("supportCtaHref", currentUser),
+    }),
+    defineField({
+      name: "defaultSeo",
+      type: "seo",
+      hidden: ({ currentUser }) => hideAdminOnlySiteSetting("defaultSeo", currentUser),
+    }),
   ],
   preview: { prepare: () => ({ title: "Site Settings" }) },
 });

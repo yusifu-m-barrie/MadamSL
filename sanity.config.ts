@@ -35,7 +35,11 @@ export default defineConfig({
       const access = studioAccess(currentUser);
       if (access.kind === "admin") return prev;
       if (access.kind === "denied") return [];
-      return prev.filter((template) => canEditSchemaType(currentUser, template.schemaType));
+      return prev.filter(
+        (template) =>
+          template.schemaType !== "siteSettings" &&
+          canEditSchemaType(currentUser, template.schemaType),
+      );
     },
   },
   tools: (prev, { currentUser }) => {
@@ -53,6 +57,7 @@ export default defineConfig({
           item.templateId ||
           (item as { schemaType?: string }).schemaType ||
           "";
+        if (type === "siteSettings") return false;
         return canEditSchemaType(currentUser, type);
       });
     },

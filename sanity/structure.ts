@@ -1,5 +1,5 @@
 import type { StructureBuilder, StructureResolver } from "sanity/structure";
-import { lockedPagesGroqFilter, shouldHideLockedPages, studioAccess } from "./access";
+import { studioAccess } from "./access";
 
 function projectsFolder(S: StructureBuilder) {
   return S.listItem()
@@ -101,69 +101,64 @@ function staffFolder(S: StructureBuilder) {
     );
 }
 
-function pagesFolder(S: StructureBuilder, hideLockedPages = false) {
-  const lockedFilter = hideLockedPages ? ` && ${lockedPagesGroqFilter()}` : "";
-  const items = [];
-
-  if (!hideLockedPages) {
-    items.push(
-      S.listItem()
-        .title("Home")
-        .id("page-home")
-        .child(S.document().schemaType("page").documentId("page-home")),
-      S.divider(),
-    );
-  }
-
-  items.push(
-    S.listItem()
-      .title("Who we are")
-      .id("pages-who")
-      .child(
-        S.documentTypeList("page")
-          .title("Who we are")
-          .filter(
-            `_type == "page" && slug.current in ["about", "mission-vision", "core-values", "diversity-equity-inclusion"]${lockedFilter}`,
-          ),
-      ),
-    S.listItem()
-      .title("Other pages")
-      .id("pages-other")
-      .child(
-        S.documentTypeList("page")
-          .title("Other pages")
-          .filter(
-            `_type == "page" && !(slug.current in ["home", "about", "mission-vision", "core-values", "diversity-equity-inclusion"])${lockedFilter}`,
-          )
-          .defaultOrdering([{ field: "title", direction: "asc" }]),
-      ),
-    S.divider(),
-    S.listItem()
-      .title("All pages")
-      .id("pages-all")
-      .child(
-        S.documentTypeList("page")
-          .title(hideLockedPages ? "All pages (except Home & Contact)" : "All pages")
-          .filter(`_type == "page"${lockedFilter}`)
-          .defaultOrdering([{ field: "title", direction: "asc" }]),
-      ),
-  );
-
+function pagesFolder(S: StructureBuilder) {
   return S.listItem()
     .title("Pages")
     .id("pages-folder")
-    .child(S.list().title("Pages").items(items));
+    .child(
+      S.list()
+        .title("Pages")
+        .items([
+          S.listItem()
+            .title("Home")
+            .id("page-home")
+            .child(S.document().schemaType("page").documentId("page-home")),
+          S.listItem()
+            .title("Contact Us")
+            .id("page-contact")
+            .child(
+              S.document().schemaType("siteSettings").documentId("siteSettings"),
+            ),
+          S.divider(),
+          S.listItem()
+            .title("Who we are")
+            .id("pages-who")
+            .child(
+              S.documentTypeList("page")
+                .title("Who we are")
+                .filter(
+                  '_type == "page" && slug.current in ["about", "mission-vision", "core-values", "diversity-equity-inclusion"]',
+                ),
+            ),
+          S.listItem()
+            .title("Other pages")
+            .id("pages-other")
+            .child(
+              S.documentTypeList("page")
+                .title("Other pages")
+                .filter(
+                  '_type == "page" && !(slug.current in ["home", "about", "mission-vision", "core-values", "diversity-equity-inclusion"])',
+                )
+                .defaultOrdering([{ field: "title", direction: "asc" }]),
+            ),
+          S.divider(),
+          S.listItem()
+            .title("All pages")
+            .id("pages-all")
+            .child(
+              S.documentTypeList("page")
+                .title("All pages")
+                .defaultOrdering([{ field: "title", direction: "asc" }]),
+            ),
+        ]),
+    );
 }
 
-function itemsForTypes(
-  S: StructureBuilder,
-  types: string[],
-  options: { hideLockedPages?: boolean } = {},
-) {
+function itemsForTypes(S: StructureBuilder, types: string[]) {
   const allowed = new Set(types);
   const items = [];
 
-  if (allowed.has("page")) items.push(pagesFolder(S, options.hideLockedPages));
+  if (allowed.has("page")) items.push(pagesFolder(S));
   if (allowed.has("post")) items.push(S.documentTypeListItem("post").title("News"));
   if (allowed.has("whatWeDoPage")) {
     items.push(
@@ -265,13 +260,7 @@ export const deskStructure: StructureResolver = (S, context) => {
   }
 
   if (access.kind === "restricted") {
-    return S.list()
-      .title(access.deskTitle)
-      .items(
-        itemsForTypes(S, access.types, {
-          hideLockedPages: shouldHideLockedPages(context.currentUser),
-        }),
-      );
+    return S.list().title(access.deskTitle).items(itemsForTypes(S, access.types));
   }
 
   return fullDesk(S);

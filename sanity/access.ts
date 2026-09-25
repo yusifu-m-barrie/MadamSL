@@ -5,8 +5,8 @@ import type { CurrentUser } from "sanity";
  *
  * - Listed admin emails → full CMS (settings, navigation, images, videos, etc.)
  * - Every other invited member → content sections only
- *   Pages, News, What We Do, Projects, Staff, Partners, News Letters, Locations
- *   Home and Contact pages stay locked.
+ *   Pages (including Home and Contact), News, What We Do, Projects, Staff,
+ *   Partners, News Letters, Locations
  *
  * On the Free plan invite people as Administrator; this still hides admin sections.
  * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
@@ -14,6 +14,7 @@ import type { CurrentUser } from "sanity";
 
 export const CONTENT_EDITOR_TYPES = [
   "page",
+  "siteSettings",
   "post",
   "whatWeDoPage",
   "project",
@@ -25,9 +26,8 @@ export const CONTENT_EDITOR_TYPES = [
 
 const HARDCODED_ADMIN_EMAILS = ["ayonbarrie4@gmail.com"];
 
-/** Page editors cannot open or change these CMS pages. */
-export const LOCKED_PAGE_SLUGS = ["home", "contact"] as const;
-export const LOCKED_PAGE_IDS = ["page-home", "page-contact"] as const;
+/** Contact details live on siteSettings; editors may change only these fields. */
+export const EDITOR_CONTACT_FIELDS = ["address", "phone", "email", "mapEmbedUrl"] as const;
 
 export type StudioAccess =
   | { kind: "denied" }
@@ -84,6 +84,15 @@ export function isRestrictedEditor(user: CurrentUser | null | undefined): boolea
   return studioAccess(user).kind === "restricted";
 }
 
+/** Hide non-contact Site Settings fields from invited editors. */
+export function hideAdminOnlySiteSetting(
+  fieldName: string,
+  user: CurrentUser | null | undefined,
+): boolean {
+  if (!isRestrictedEditor(user)) return false;
+  return !(EDITOR_CONTACT_FIELDS as readonly string[]).includes(fieldName);
+}
+
 export function canEditSchemaType(
   user: CurrentUser | null | undefined,
   schemaType: string,
@@ -94,38 +103,12 @@ export function canEditSchemaType(
   return access.types.includes(schemaType);
 }
 
-export function publishedDocumentId(documentId?: string | null): string | undefined {
-  if (!documentId) return undefined;
-  return documentId.replace(/^drafts\./, "");
-}
-
-export function isLockedPageDocument(documentId?: string | null): boolean {
-  const id = publishedDocumentId(documentId);
-  if (!id) return false;
-  if ((LOCKED_PAGE_IDS as readonly string[]).includes(id)) return true;
-  return (LOCKED_PAGE_SLUGS as readonly string[]).some((slug) => id === `page-${slug}`);
-}
-
-export function shouldHideLockedPages(user: CurrentUser | null | undefined): boolean {
-  return studioAccess(user).kind === "restricted";
-}
-
-export function lockedPagesGroqFilter(): string {
-  const slugs = LOCKED_PAGE_SLUGS.map((slug) => `"${slug}"`).join(", ");
-  const ids = LOCKED_PAGE_IDS.flatMap((id) => [`"${id}"`, `"drafts.${id}"`]).join(", ");
-  return `!(slug.current in [${slugs}]) && !(_id in [${ids}])`;
-}
-
 export function canEditDocument(
   user: CurrentUser | null | undefined,
   schemaType: string,
-  documentId?: string | null,
+  _documentId?: string | null,
 ): boolean {
-  if (!canEditSchemaType(user, schemaType)) return false;
-  if (schemaType === "page" && shouldHideLockedPages(user) && isLockedPageDocument(documentId)) {
-    return false;
-  }
-  return true;
+  return canEditSchemaType(user, schemaType);
 }
 
 /** @deprecated Use CONTENT_EDITOR_TYPES */
