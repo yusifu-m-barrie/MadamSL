@@ -1,5 +1,3 @@
-import type { CurrentUser } from "sanity";
-
 /**
  * Studio UI access:
  *
@@ -34,6 +32,11 @@ export type StudioAccess =
   | { kind: "admin" }
   | { kind: "restricted"; types: string[]; deskTitle: string };
 
+/** Studio user as seen in schema callbacks (Sanity omits legacy `role`). */
+type StudioUser = {
+  email?: string | null;
+} | null | undefined;
+
 function parseEnvEmails(raw?: string): string[] {
   if (!raw?.trim()) return [];
   return raw
@@ -42,7 +45,7 @@ function parseEnvEmails(raw?: string): string[] {
     .filter(Boolean);
 }
 
-function userEmail(user: CurrentUser | null | undefined): string | undefined {
+function userEmail(user: StudioUser): string | undefined {
   const email = user?.email?.trim().toLowerCase();
   return email || undefined;
 }
@@ -56,17 +59,17 @@ export function adminEmails(): string[] {
   ];
 }
 
-export function isListedAdmin(user: CurrentUser | null | undefined): boolean {
+export function isListedAdmin(user: StudioUser): boolean {
   const email = userEmail(user);
   if (!email) return false;
   return adminEmails().includes(email);
 }
 
-export function isAdministrator(user: CurrentUser | null | undefined): boolean {
+export function isAdministrator(user: StudioUser): boolean {
   return isListedAdmin(user);
 }
 
-export function studioAccess(user: CurrentUser | null | undefined): StudioAccess {
+export function studioAccess(user: StudioUser): StudioAccess {
   if (!user) return { kind: "denied" };
 
   if (isListedAdmin(user)) {
@@ -80,23 +83,17 @@ export function studioAccess(user: CurrentUser | null | undefined): StudioAccess
   };
 }
 
-export function isRestrictedEditor(user: CurrentUser | null | undefined): boolean {
+export function isRestrictedEditor(user: StudioUser): boolean {
   return studioAccess(user).kind === "restricted";
 }
 
 /** Hide non-contact Site Settings fields from invited editors. */
-export function hideAdminOnlySiteSetting(
-  fieldName: string,
-  user: CurrentUser | null | undefined,
-): boolean {
+export function hideAdminOnlySiteSetting(fieldName: string, user: StudioUser): boolean {
   if (!isRestrictedEditor(user)) return false;
   return !(EDITOR_CONTACT_FIELDS as readonly string[]).includes(fieldName);
 }
 
-export function canEditSchemaType(
-  user: CurrentUser | null | undefined,
-  schemaType: string,
-): boolean {
+export function canEditSchemaType(user: StudioUser, schemaType: string): boolean {
   const access = studioAccess(user);
   if (access.kind === "denied") return false;
   if (access.kind === "admin") return true;
@@ -104,7 +101,7 @@ export function canEditSchemaType(
 }
 
 export function canEditDocument(
-  user: CurrentUser | null | undefined,
+  user: StudioUser,
   schemaType: string,
   _documentId?: string | null,
 ): boolean {
@@ -119,7 +116,7 @@ export function isNewsDeskType(schemaType: string): boolean {
   return (NEWS_DESK_TYPES as readonly string[]).includes(schemaType);
 }
 
-export function isNewsOnlyEditor(user: CurrentUser | null | undefined): boolean {
+export function isNewsOnlyEditor(user: StudioUser): boolean {
   return isRestrictedEditor(user);
 }
 
