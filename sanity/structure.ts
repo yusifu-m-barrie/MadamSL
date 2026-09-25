@@ -158,6 +158,48 @@ function itemsForTypes(S: StructureBuilder, types: string[]) {
   const allowed = new Set(types);
   const items = [];
 
+  if (allowed.has("siteSettings")) {
+    items.push(
+      S.listItem()
+        .title("Site Settings")
+        .id("siteSettings")
+        .child(S.document().schemaType("siteSettings").documentId("siteSettings")),
+    );
+  }
+  if (allowed.has("siteImages")) {
+    items.push(
+      S.listItem()
+        .title("Website Images")
+        .id("siteImages")
+        .child(S.document().schemaType("siteImages").documentId("siteImages")),
+    );
+  }
+  if (allowed.has("homepageVideos")) {
+    items.push(
+      S.listItem()
+        .title("Homepage Videos")
+        .id("homepageVideos")
+        .child(
+          S.document().schemaType("homepageVideos").documentId("homepageVideos"),
+        ),
+    );
+  }
+  if (allowed.has("navigation")) {
+    items.push(
+      S.listItem()
+        .title("Navigation")
+        .id("navigation")
+        .child(S.document().schemaType("navigation").documentId("navigation")),
+    );
+  }
+  if (
+    allowed.has("siteSettings") ||
+    allowed.has("siteImages") ||
+    allowed.has("homepageVideos") ||
+    allowed.has("navigation")
+  ) {
+    items.push(S.divider());
+  }
   if (allowed.has("page")) items.push(pagesFolder(S));
   if (allowed.has("post")) items.push(S.documentTypeListItem("post").title("News"));
   if (allowed.has("whatWeDoPage")) {

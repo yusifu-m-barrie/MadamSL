@@ -1,18 +1,22 @@
 /**
  * Studio UI access:
  *
- * - Listed admin emails → full CMS (settings, navigation, images, videos, etc.)
- * - Every other invited member → content sections only
- *   Pages (including Home and Contact), News, What We Do, Projects, Staff,
- *   Partners, News Letters, Locations
+ * - Listed admin emails → full CMS including Categories and Authors
+ * - Every other invited member → the Content sidebar:
+ *   Site Settings, Website Images, Homepage Videos, Navigation,
+ *   Pages, News, What We Do, Projects, Staff, Partners, News Letters, Locations
  *
- * On the Free plan invite people as Administrator; this still hides admin sections.
+ * On the Free plan invite people as Administrator; this still hides Vision
+ * and taxonomy (Categories / Authors).
  * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
  */
 
 export const CONTENT_EDITOR_TYPES = [
-  "page",
   "siteSettings",
+  "siteImages",
+  "homepageVideos",
+  "navigation",
+  "page",
   "post",
   "whatWeDoPage",
   "project",
@@ -23,9 +27,6 @@ export const CONTENT_EDITOR_TYPES = [
 ] as const;
 
 const HARDCODED_ADMIN_EMAILS = ["ayonbarrie4@gmail.com"];
-
-/** Contact details live on siteSettings; editors may change only these fields. */
-export const EDITOR_CONTACT_FIELDS = ["address", "phone", "email", "mapEmbedUrl"] as const;
 
 export type StudioAccess =
   | { kind: "denied" }
@@ -85,12 +86,6 @@ export function studioAccess(user: StudioUser): StudioAccess {
 
 export function isRestrictedEditor(user: StudioUser): boolean {
   return studioAccess(user).kind === "restricted";
-}
-
-/** Hide non-contact Site Settings fields from invited editors. */
-export function hideAdminOnlySiteSetting(fieldName: string, user: StudioUser): boolean {
-  if (!isRestrictedEditor(user)) return false;
-  return !(EDITOR_CONTACT_FIELDS as readonly string[]).includes(fieldName);
 }
 
 export function canEditSchemaType(user: StudioUser, schemaType: string): boolean {

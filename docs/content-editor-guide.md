@@ -6,7 +6,7 @@ This site is managed in **Sanity Studio** (no WordPress login).
 
 1. Go to `https://www.madam-sl.org/studio` (or `http://localhost:3000/studio` locally)
 2. Sign in with the **Google / email account you were invited with**
-3. Invited editors see Pages (including Home and Contact Us), News, What We Do, Projects, Staff, Partners, News Letters, and Locations. Only listed admin emails see Site Settings, Navigation, Website Images, and Homepage Videos.
+3. Invited editors can open and edit everything in the Content sidebar: Site Settings, Website Images, Homepage Videos, Navigation, Pages, News, What We Do, Projects, Staff, Partners, News Letters, and Locations.
 
 Studio access:
 
@@ -21,7 +21,7 @@ Studio access:
 | Who | What they can update |
 |-----|----------------------|
 | Admin email (`ayonbarrie4@gmail.com` and `NEXT_PUBLIC_SANITY_ADMIN_EMAILS`) | Full dashboard |
-| Every other invited person | Pages including Home and Contact Us, News, What We Do, Projects, Staff, Partners, News Letters, Locations |
+| Every other invited person | Site Settings, Website Images, Homepage Videos, Navigation, Pages, News, What We Do, Projects, Staff, Partners, News Letters, Locations |
 
 Do not share Studio passwords.
 

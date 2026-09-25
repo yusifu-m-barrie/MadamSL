@@ -15,7 +15,7 @@ Copy `.env.example` → `.env.local` (never commit secrets).
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | yes | Sanity project |
 | `NEXT_PUBLIC_SANITY_DATASET` | yes | Usually `production` |
 | `NEXT_PUBLIC_SANITY_API_VERSION` | yes | e.g. `2025-01-01` |
-| `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` | yes | Full Studio dashboard (comma-separated). Everyone else invited to the project gets content sections only. |
+| `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` | yes | Extra admin tools (Categories, Authors, Vision). Invited members still get the full Content sidebar. |
 | `NEXT_PUBLIC_SITE_URL` | yes | Canonical origin |
 | `SANITY_API_READ_TOKEN` | **no** | Draft/preview reads |
 | `SANITY_REVALIDATE_SECRET` | **no** | Webhook auth |
