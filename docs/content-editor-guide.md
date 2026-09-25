@@ -7,6 +7,7 @@ This site is managed in **Sanity Studio** (no WordPress login).
 1. Go to `https://www.madam-sl.org/studio` (or `http://localhost:3000/studio` locally)
 2. Sign in with the **Google / email account you were invited with**
 3. Invited editors can open and edit everything in the Content sidebar: Site Settings, Website Images, Homepage Videos, Navigation, Pages, News, What We Do, Projects, Staff, Partners, News Letters, and Locations.
+4. If Studio says **Your role Viewer does not have permission to edit this document**, that person was invited as Viewer. Change their member role to **Administrator** in [Sanity Manage → Members](https://www.sanity.io/manage/project/n5hnlyba/members), then they sign out of Studio and sign in again.
 
 Studio access:
 

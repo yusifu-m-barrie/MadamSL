@@ -25,6 +25,10 @@ export default defineConfig({
   projectId,
   dataset,
   basePath: "/studio",
+  // Drafts/releases make published singletons look read-only in Studio.
+  // These four settings docs should save in place for every writer.
+  releases: { enabled: false },
+  scheduledDrafts: { enabled: false },
   plugins: [
     structureTool({ structure: deskStructure }),
     visionTool(),

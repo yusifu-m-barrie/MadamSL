@@ -7,7 +7,7 @@
  *   Pages, News, What We Do, Projects, Staff, Partners, News Letters, Locations
  *
  * On the Free plan invite people as Administrator; this still hides Vision
- * and taxonomy (Categories / Authors).
+ * and taxonomy (Categories / Authors). Viewer cannot save anything (Sanity ACL).
  * UI lockdown only — API hard-locks need Sanity Enterprise custom roles.
  */
 

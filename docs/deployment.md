@@ -43,7 +43,7 @@ Add CORS origin for local (`http://localhost:3000`) and production domain in San
 1. In [Sanity Manage → Members](https://www.sanity.io/manage/project/n5hnlyba), invite the person:
    - **Free plan:** use **Administrator** for anyone who must publish (Editor is a Growth-plan role). Studio still limits them to content sections.
    - Do not use **Viewer** (cannot edit) or **Blueprint**.
-2. Only add an email to `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` if they should see the full CMS (settings, navigation, images).
+2. Only add an email to `NEXT_PUBLIC_SANITY_ADMIN_EMAILS` if they should also see Categories, Authors, and Vision. Every invited Administrator already gets Site Settings, Website Images, Homepage Videos, and Navigation.
 3. Redeploy if you changed admin emails.
 4. They open `https://www.madam-sl.org/studio` and sign in.
 

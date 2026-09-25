@@ -94,6 +94,7 @@ export const homepageVideos = defineType({
   name: "homepageVideos",
   title: "Homepage Videos",
   type: "document",
+  liveEdit: true,
   fields: [
     defineField({
       name: "heading",

@@ -36,6 +36,7 @@ export const siteSettings = defineType({
   name: "siteSettings",
   title: "Site Settings",
   type: "document",
+  liveEdit: true,
   fields: [
     defineField({ name: "siteName", type: "string", initialValue: "MADAM" }),
     defineField({ name: "tagline", type: "string" }),
@@ -82,6 +83,7 @@ export const navigation = defineType({
   name: "navigation",
   title: "Navigation",
   type: "document",
+  liveEdit: true,
   fields: [
     defineField({
       name: "items",

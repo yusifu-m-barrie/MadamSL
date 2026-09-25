@@ -8,6 +8,7 @@ export const siteImages = defineType({
   name: "siteImages",
   title: "Website Images",
   type: "document",
+  liveEdit: true,
   fields: [
     defineField({
       name: "note",
