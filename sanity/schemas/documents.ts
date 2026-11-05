@@ -130,8 +130,30 @@ export const post = defineType({
     defineField({
       name: "slug",
       type: "slug",
-      options: { source: "title" },
-      validation: (r) => r.required(),
+      description: "Click Generate. This becomes the web address /news/your-title — no spaces.",
+      options: {
+        source: "title",
+        maxLength: 96,
+        slugify: (input) =>
+          input
+            .toLowerCase()
+            .replace(/['’]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "")
+            .slice(0, 96),
+      },
+      validation: (r) =>
+        r.required().custom((value) => {
+          const current =
+            value && typeof value === "object" && "current" in value
+              ? String((value as { current?: string }).current || "")
+              : "";
+          if (!current) return "Click Generate to create the URL";
+          if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(current)) {
+            return "Click Generate so the URL has no spaces (for example: madam-opens-new-centre)";
+          }
+          return true;
+        }),
     }),
     defineField({ name: "excerpt", type: "text", rows: 3 }),
     defineField({ name: "mainImage", type: "image", options: { hotspot: true } }),

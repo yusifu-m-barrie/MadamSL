@@ -11,7 +11,7 @@ import { ProgramIcon, iconKindFromTitle } from "@/components/sections/ProgramIco
 import { ContactForm } from "@/components/content/ContactForm";
 import { NewsletterGrid } from "@/components/content/NewsletterGrid";
 import { Reveal } from "@/components/ui/Reveal";
-import { formatDate } from "@/lib/utils";
+import { formatDate, newsPath } from "@/lib/utils";
 import { Users } from "lucide-react";
 import type {
   PageSection,
@@ -688,7 +688,7 @@ export function NewsGrid({ posts }: { posts: PostListItem[] }) {
         return (
           <Reveal key={post._id} delayMs={Math.min(i * 40, 160)} as="article">
             <article className="card-interactive flex h-full flex-col overflow-hidden border-b-4 border-[var(--madam-green)] bg-[var(--madam-card)] shadow-sm">
-              <Link href={`/news/${post.slug}`} className="relative block aspect-[16/10] bg-[var(--madam-surface)]">
+              <Link href={newsPath(post.slug)} className="relative block aspect-[16/10] bg-[var(--madam-surface)]">
                 {imgSrc ? (
                   <Image
                     src={imgSrc}
@@ -710,7 +710,7 @@ export function NewsGrid({ posts }: { posts: PostListItem[] }) {
                 </time>
                 <h3 className="mt-2 text-xl font-bold text-[var(--madam-ink)] md:text-2xl">
                   <Link
-                    href={`/news/${post.slug}`}
+                    href={newsPath(post.slug)}
                     className="transition hover:text-[var(--madam-green)]"
                   >
                     {post.title || "Untitled update"}

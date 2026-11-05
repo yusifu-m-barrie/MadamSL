@@ -41,7 +41,7 @@ Sections are building blocks (text, image + text, staff list, etc.). Ask a devel
 
 1. Open **News** → Create
 2. Add **Title** (required)
-3. Confirm the **Slug** (URL piece under `/news/…`)
+3. Click **Generate** on the **Slug** (this becomes `/news/your-title` — no spaces)
 4. Add **Excerpt**, **Main image**, and **Body**
 5. Set **Category** and **Author** if needed
 6. Set **Published at** date

@@ -17,6 +17,8 @@ function authorize(request: NextRequest) {
 function revalidateAll() {
   revalidateTag("sanity", "max");
   revalidatePath("/");
+  revalidatePath("/news");
+  revalidatePath("/news/[slug]", "page");
   revalidatePath("/studio");
 }
 

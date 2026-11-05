@@ -13,7 +13,7 @@ import {
 import { Container, Section, SectionHeading } from "@/components/ui/Container";
 import { RichText, PlainParagraphs } from "@/components/content/RichText";
 import { NewsGrid } from "@/components/sections/SectionRenderer";
-import { formatDate } from "@/lib/utils";
+import { formatDate, newsPath, toUrlSlug } from "@/lib/utils";
 import { getPostBySlug, getPosts } from "@/lib/content";
 import { resolveImageSrc } from "@/sanity/lib/image";
 import type { SanityImage } from "@/sanity/types";
@@ -23,10 +23,14 @@ type Props = {
 };
 
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const posts = await getPosts();
-  return posts.map((p) => ({ slug: p.slug }));
+  return posts
+    .map((p) => toUrlSlug(p.slug))
+    .filter(Boolean)
+    .map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -58,8 +62,8 @@ function LinkedInIcon({ className }: { className?: string }) {
 function ShareLinks({ title, slug }: { title: string; slug: string }) {
   const url =
     typeof process.env.NEXT_PUBLIC_SITE_URL === "string"
-      ? `${process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")}/news/${slug}`
-      : `https://www.madam-sl.org/news/${slug}`;
+      ? `${process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")}${newsPath(slug)}`
+      : `https://www.madam-sl.org${newsPath(slug)}`;
   const encoded = encodeURIComponent(url);
   const text = encodeURIComponent(title);
   return (
@@ -176,7 +180,7 @@ export default async function NewsPostPage({ params }: Props) {
           >
             {prev ? (
               <Link
-                href={`/news/${prev.slug}`}
+                href={newsPath(prev.slug)}
                 className="group flex max-w-[45%] items-center gap-2 text-sm font-semibold text-[var(--madam-green)] transition hover:text-[var(--madam-green-dark)]"
               >
                 <ChevronLeft className="h-5 w-5 shrink-0" />
@@ -189,7 +193,7 @@ export default async function NewsPostPage({ params }: Props) {
             )}
             {next ? (
               <Link
-                href={`/news/${next.slug}`}
+                href={newsPath(next.slug)}
                 className="group flex max-w-[45%] items-center justify-end gap-2 text-right text-sm font-semibold text-[var(--madam-green)] transition hover:text-[var(--madam-green-dark)]"
               >
                 <span className="line-clamp-2 group-hover:underline">

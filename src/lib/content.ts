@@ -30,6 +30,7 @@ import type {
 import type { SiteImages, SiteImageSlot } from "@/sanity/types/siteImages";
 import type { HomepageVideosDoc } from "@/sanity/types/videos";
 import type { WhatWeDoPageDoc } from "@/sanity/types/whatWeDo";
+import { toUrlSlug } from "@/lib/utils";
 import {
   seedSettings,
   seedNavigation,
@@ -139,23 +140,65 @@ function dedupePostsByTitle(posts: PostListItem[]): PostListItem[] {
 }
 
 export async function getPosts(): Promise<PostListItem[]> {
-  const data = await safeFetch<PostListItem[]>(postsQuery);
+  const data = await safeFetch<PostListItem[]>(postsQuery, {}, { noStore: true });
   return dedupePostsByTitle(data?.length ? data : seedPosts);
 }
 
+type PostDetail = PostListItem & {
+  body?: unknown;
+  seo?: unknown;
+  author?: { name?: string };
+};
+
+function postSlugMatches(stored: string | undefined, requested: string) {
+  if (!stored) return false;
+  if (stored === requested) return true;
+  return toUrlSlug(stored) === toUrlSlug(requested);
+}
+
 export async function getPostBySlug(slug: string) {
-  const data = await safeFetch<PostListItem & { body?: unknown; seo?: unknown; author?: { name?: string } }>(
-    postBySlugQuery,
-    { slug },
+  const decoded = (() => {
+    try {
+      return decodeURIComponent(slug.replace(/\+/g, " ")).trim();
+    } catch {
+      return slug.replace(/\+/g, " ").trim();
+    }
+  })();
+  const kebab = toUrlSlug(decoded);
+
+  for (const candidate of [...new Set([decoded, kebab, slug].filter(Boolean))]) {
+    const data = await safeFetch<PostDetail>(
+      postBySlugQuery,
+      { slug: candidate },
+      { noStore: true },
+    );
+    if (data) return data;
+  }
+
+  const listed = await getPosts();
+  const match = listed.find((post) => postSlugMatches(post.slug, decoded));
+  if (match?.slug) {
+    const data = await safeFetch<PostDetail>(
+      postBySlugQuery,
+      { slug: match.slug },
+      { noStore: true },
+    );
+    if (data) return data;
+  }
+
+  return (
+    seedPosts.find((post) => postSlugMatches(post.slug, decoded)) ?? null
   );
-  if (data) return data;
-  return seedPosts.find((p) => p.slug === slug) ?? null;
 }
 
 export async function getLatestPosts(limit = 3): Promise<PostListItem[]> {
   // Fetch a few extras so title-dedupe still fills the requested limit
   const fetchLimit = Math.min(limit + 5, 50);
-  const data = await safeFetch<PostListItem[]>(latestPostsQuery, { limit: fetchLimit });
+  const data = await safeFetch<PostListItem[]>(
+    latestPostsQuery,
+    { limit: fetchLimit },
+    { noStore: true },
+  );
   if (data?.length) return dedupePostsByTitle(data).slice(0, limit);
   return seedPosts.slice(0, limit);
 }

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getPosts, getProjects } from "@/lib/content";
+import { newsPath } from "@/lib/utils";
 
 const base = process.env.NEXT_PUBLIC_SITE_URL || "https://www.madam-sl.org";
 
@@ -37,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: path === "/" ? 1 : 0.7,
     })),
     ...posts.map((post) => ({
-      url: `${base}/news/${post.slug}`,
+      url: `${base}${newsPath(post.slug)}`,
       lastModified: post.publishedAt ? new Date(post.publishedAt) : new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.6,
